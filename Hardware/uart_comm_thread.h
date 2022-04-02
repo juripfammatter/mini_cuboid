@@ -1,12 +1,9 @@
 #ifndef UART_COMM_THREAD_H_
 #define UART_COMM_THREAD_H_
 
-#include "GPA.h"
 #include "DataLogger.h"
 #include "mbed.h"
 #include "ThreadFlag.h"
-#include "data_structs.h"
-#include "Mirror_Kinematic.h"
 
 
 using namespace std;
@@ -32,7 +29,7 @@ using namespace std;
 class uart_comm_thread{
 public:
 // public members
-    uart_comm_thread(Data_Xchange *,Mirror_Kinematic *, BufferedSerial*,float);
+    uart_comm_thread(BufferedSerial*,float);
     virtual ~uart_comm_thread();
     void run(void);             // runs the statemachine, call this function periodicly, returns true when new data ready (only true for 1 cycle)
    // void request();         // request new set of data  
@@ -65,8 +62,6 @@ private:
     Ticker                  ticker;
     Mutex mutex;
 	void sendThreadFlag();
-    Data_Xchange *m_data;
-    Mirror_Kinematic *m_mk;
 };
 
 #endif

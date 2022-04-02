@@ -12,10 +12,11 @@ using namespace std;
 
 Enc_unwrap_scale::Enc_unwrap_scale(uint16_t incPerRev, uint8_t bits)
 {   
-    this->incPerRev = incPerRev;    // incr encoder with 4000inc/rev
+    this->incPerRev = incPerRev;    // incr encoder 
     this->max_delta = 1<<(bits-1);
     inc2rad = 2.0*pi/static_cast<double>(incPerRev); 
     num_overflows = 0;
+    incPast = 0;
 
 }
 Enc_unwrap_scale::~Enc_unwrap_scale() {}

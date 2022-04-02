@@ -1,7 +1,7 @@
 #pragma once
 #include <stdint.h>
 
-#define N_ROW 250
+#define N_ROW 10
 #define N_COL 4
 
 

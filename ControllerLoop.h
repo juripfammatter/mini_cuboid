@@ -6,6 +6,7 @@
 #include "PID_Cntrl.h"
 #include "DataLogger.h"
 #include "sensors_actuators.h"
+#include "IIR_filter.h"
 
 
 // This is the loop class, it is not a controller at first hand, it guarantees a cyclic call
@@ -26,5 +27,6 @@ private:
     Timer ti;
     float Ts;
     void sendSignal();
+    float est_angle();
     sensors_actuators *m_sa;
 };

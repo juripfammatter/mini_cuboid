@@ -3,43 +3,65 @@
 #define PI 3.1415927
 // constructors
 
-
-// Deconstructor
-sensors_actuators::sensors_actuators(Data_Xchange *data,float Ts) : di1(.0005,Ts),di2(.0005,Ts),big_button(PC_3),counter1(PA_6, PC_7),
-                            indexpulse1(PA_8),index1(counter1,indexpulse1), counter2(PB_6, PB_7),indexpulse2(PB_4),index2(counter2,indexpulse2),
-                            i_enable(PC_4),laser_on(PB_0), i_des1(PA_5),i_des2(PA_4),uw1(4000,16),uw2(4000,16)
+sensors_actuators::sensors_actuators(float Ts) : di(.05,Ts),counter(PA_8, PA_9),
+                            i_enable(PB_1),i_des(PA_4),uw(4*2048,16),spi(PA_12, PA_11, PA_1),imu(spi, PB_0)
 {
-    this->m_data = data;
-    i2u.setup(-.80,.80,0.0f,1.0f);
-    u2i.setup(0.0,1.0,-1.0,1.0);
+    i2u.setup(-15,15,0.0f,1.0f);
+    ax2ax.setup(-32767,32768,-9.81*2,9.81*2);
+    ay2ay.setup(-17420,15450,-9.81,9.81);
+    gz2gz.setup(-32767,32768,-1000*PI/180,1000*PI/180);
+
+    
     i_enable = 0;       // disable current first
-    counter1.reset();   // encoder reset
-    counter2.reset();   // encoder reset
-    this->set_laser_on_off(false);
+    counter.reset();   // encoder reset
+    imu.init_inav();
+    imu.configuration();
+    
 }
+// Deconstructor
 sensors_actuators::~sensors_actuators() {} 
 
-void sensors_actuators::read_encoders_calc_speed(void)
+void sensors_actuators::read_sensors_calc_speed(void)
 {
-    m_data->sens_phi[0] = uw1(counter1);
-    m_data->sens_phi[1] = uw2(counter2);
-    m_data->sens_Vphi[0] = di1(m_data->sens_phi[0]);
-    m_data->sens_Vphi[1] = di2(m_data->sens_phi[1]);
+    phi = uw(counter);
+    Vphi = di(phi);
+    //-------------- read imu ------------
+    accx = ax2ax(imu.readAcc_raw(1));
+    accy = ay2ay(-imu.readAcc_raw(0));
+    gyrz = gz2gz(imu.readGyro_raw(2));
 }
 
-void sensors_actuators::enable_motors(bool enable)
+void sensors_actuators::enable_escon(void)
 {
-    i_enable = big_button && enable;    
+    i_enable = 1;    
+}
+void sensors_actuators::disable_escon(void)
+{
+    i_enable = 0;    
 }
 
-void sensors_actuators::write_current(uint8_t mot_nb, float i_des)
+void sensors_actuators::write_current(float i_des)
 {
-    if(mot_nb== 0)
-        i_des1 = i2u(i_des);
-    else if(mot_nb == 1)
-        i_des2 = i2u(i_des);    
+        i_des = i2u(i_des);   
 }
-void sensors_actuators::set_laser_on_off(bool laser_on_off)
+
+float sensors_actuators::get_phi(void)
 {
-    laser_on = laser_on_off;
+    return phi;
+}
+float sensors_actuators::get_vphi(void)
+{
+    return Vphi;
+}
+float sensors_actuators::get_ax(void)
+{
+    return accx;
+}
+float sensors_actuators::get_ay(void)
+{
+    return accy;
+}
+float sensors_actuators::get_gz(void)
+{
+    return gyrz;
 }

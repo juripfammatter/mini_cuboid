@@ -6,8 +6,6 @@
 
 extern DataLogger myDataLogger;
 
-extern GPA myGPA;
-
 
 
 /*
@@ -81,12 +79,10 @@ extern GPA myGPA;
 
 
 // #### constructor
-uart_comm_thread::uart_comm_thread(Data_Xchange *data,Mirror_Kinematic *mk,BufferedSerial *com, float Ts): thread(osPriorityBelowNormal, 4096)
+uart_comm_thread::uart_comm_thread(BufferedSerial *com, float Ts): thread(osPriorityBelowNormal, 4096)
  {  
     // init serial
     this->uart = com;
-    this->m_data = data;
-    this->m_mk = mk;
     this->Ts = Ts;
     this->csm = 0;
     gpa_stop_sent = false;
@@ -118,60 +114,7 @@ void uart_comm_thread::run(void)
 		switch(send_state)
 			{
 			case 1011:
-				send(101,12,2*4,(char *)&(m_data->sens_phi[0]));		// send actual phi values (1 and 2)
-				send_state = 1012;
 				break;	
-			case 1012:
-				send(101,34,2*4,(char *)&(m_data->est_xy[0]));		// send actual xy values 
-				send_state = 210;
-				break;	
-			case 125:		// number of iterations in the trafo
-				send(125,1,1,(char *)&m_data->num_it);		
-				send_state = 210;
-				break;
-			case 210:		// number of iterations in the trafo
-				if(myDataLogger.new_data_available)
-                    {
-                        if(myDataLogger.packet*PACK_SIZE<4*myDataLogger.N_col*myDataLogger.N_row)
-                            send(210,1+myDataLogger.packet,PACK_SIZE,(char *)&(myDataLogger.log_data[myDataLogger.packet*(PACK_SIZE/4)]));
-                        else
-                            {
-                            send(210,1+myDataLogger.packet,4*myDataLogger.N_col*myDataLogger.N_row-myDataLogger.packet*PACK_SIZE,(char *)&(myDataLogger.log_data[myDataLogger.packet*PACK_SIZE/4]));
-                            myDataLogger.log_status = 1;
-                            myDataLogger.new_data_available = false;
-                            send_state = 211;
-                            }
-                        ++myDataLogger.packet;
-                    }
-                else
-                    send_state = 250;
-				break;
-            case 211:
-                send(210,99,0,buffer);
-                send_state = 250;
-                break;
-			case 250:		// send GPA values
-				if(myGPA.new_data_available)
-					{
-					float dum[8];
-					myGPA.getGPAdata(dum);
-					send(250,1,32,(char *)&(dum[0]));	// send new values (8 floats)
-                    }
-				else if(myGPA.start_now)
-					{
-                    char dum = 0;
-					send(250,2,1,&dum);			// send start flag
-					myGPA.start_now = false;
-					gpa_stop_sent  = false;
-					}
-				else if(myGPA.meas_is_finished && !gpa_stop_sent && !myGPA.new_data_available)
-					{
-                    char dum = 0;
-                    send(250,255,1,&dum);		// send stop flag
-					gpa_stop_sent = true;
-					}
-				send_state = 1011;
-				break;			
 			default:
 				break;
 			}
@@ -240,116 +183,13 @@ bool uart_comm_thread::analyse_received_data(void){
 	uint16_t N = 256 * buffer[6] + buffer[5];
 	switch(msg_id1)
 		{
-		case 202:				// set desired phi or xy-values
-			if(N != 4)
-				return false;
-			switch(msg_id2)
-				{
-				case 1:
-					m_data->cntrl_phi_des[0] = *(float *)&buffer[7];
-					return true;
-					break;
-				case 2:
-					m_data->cntrl_phi_des[1] = *(float *)&buffer[7];
-					return true;
-					break;
-				case 3:
-					m_data->cntrl_xy_des[0] = 	*(float *)&buffer[7];
-					return true;
-					break;
-				case 4:
-					m_data->cntrl_xy_des[1] = *(float *)&buffer[7];
-					return true;
-					break;
-				default:
-					break;
-				}
-			break;		// case 202
-		case 203: 		// increment desired values
-			if(N != 4)
-				return false;
-			switch(msg_id2)
-				{
-				case 1:
-					m_data->cntrl_phi_des[0] += *(float *)&buffer[7];
-					return true;
-					break;
-				case 2:
-					m_data->cntrl_phi_des[1] += *(float *)&buffer[7];
-					return true;
-					break;
-				case 3:
-					m_data->cntrl_xy_des[0] += 	*(float *)&buffer[7];
-					return true;
-					break;
-				case 4:
-					m_data->cntrl_xy_des[1] += *(float *)&buffer[7];
-					return true;
-					break;
-				default:
-					break;
-				}
-			break;		// case 203
-        case 210:
-            switch(msg_id2)
-                {
-                case 101:           // receive start signal and Amp, Freq, offset values
-                    if(myDataLogger.log_status == 1)
-                        {
-                        myDataLogger.reset_data();
-                        myDataLogger.input_type = (uint8_t)buffer[7];
-                        myDataLogger.Amp = *(float *)&buffer[8];
-                        myDataLogger.omega = *(float *)&buffer[12];
-                        myDataLogger.offset = *(float *)&buffer[16];
-                        myDataLogger.downsamp = (uint8_t)buffer[20];
-                        send_text((char *)"Started time measure");
-                        myDataLogger.log_status = 2;
-                        }
-                    break;
-                }
-            break;      // case 210
-		case 220:				// switch laser on/off
-			if(N != 1)
-				return false;
-			switch(msg_id2)
-				{
-				case 1:
-					if(buffer[7] == 1)
-						m_data->laser_on = true;
-					else 
-						m_data->laser_on = false;
-					return true;
-					break;
-				}
-			break;
-		case 221:				// switch trafo on/off
-			if(N != 1)
-				return false;
-			switch(msg_id2)
-				{
-				case 1:
-					if(buffer[7] == 1)
-						m_mk->trafo_is_on = true;
-					else 
-						m_mk->trafo_is_on = false;
-					return true;
-					break;
-				}
-			break;
-		case 230:				// set internal/external control
-			if(N != 1)
-				return false;
-			switch(msg_id2)
-				{
-				case 1:
-					if(buffer[7] == 1)
-						m_mk->external_control = true;
-					else 
-						m_mk->external_control = false;
-					return true;
-					break;
-				}
-			break;
-		}
+		default:				// set desired phi or xy-values
+            break;
+		switch(msg_id2)
+            {
+            default:
+			    break;		// case 202
+            }
+        }
 	return false;	
 }

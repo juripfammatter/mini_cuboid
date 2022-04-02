@@ -1,13 +1,17 @@
 /*
  * EncoderCounter.h
- * Copyright (c) 2017, ZHAW
+ * Copyright (c) 2018, ZHAW
  * All rights reserved.
+ *
+ *  Created on: 26.01.2018
+ *      Author: Marcel Honegger
  */
 
 #ifndef ENCODER_COUNTER_H_
 #define ENCODER_COUNTER_H_
 
 #include <cstdlib>
+#include <stdint.h>
 #include <mbed.h>
 
 /**
@@ -21,9 +25,9 @@ class EncoderCounter {
                     EncoderCounter(PinName a, PinName b);
         virtual     ~EncoderCounter();
         void        reset();
-        void        reset(short offset);
-        short       read();
-                    operator short();
+        void        reset(int16_t offset);
+        int16_t     read();
+                    operator int16_t();
         
     private:
         
@@ -31,4 +35,3 @@ class EncoderCounter {
 };
 
 #endif /* ENCODER_COUNTER_H_ */
-
