@@ -27,6 +27,7 @@ public:
     void write_current(float);  // write current to motors (0,...) for motor 1, (1,...) for motor 2
     void enable_escon();
     void disable_escon();
+    bool key_was_pressed;
    
 private:
     IIR_filter di;
@@ -34,15 +35,19 @@ private:
     EncoderCounter counter;    // initialize counter on PA_6 and PC_7
     AnalogOut i_des;           // desired current values
     DigitalOut i_enable;
+    InterruptIn button;
     mpu6500_spi imu;
     //-------------------------------------
     SPI spi;                    // mosi, miso, sclk
     LinearCharacteristics i2u;
     LinearCharacteristics ax2ax,ay2ay,gz2gz;    // map imu raw values to m/s^2 and rad/s
     Enc_unwrap_scale uw;
+    Timer t_but;                            // define button time        // 
     // sensor states
     float phi;          // motor angle /rad
     float Vphi;           // motor speed / rad / s
     float accx,accy,gyrz;       // accelerations and gyroscope
+    void but_pressed(void);
+    void but_released(void);
 
 };

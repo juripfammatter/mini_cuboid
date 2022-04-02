@@ -1,7 +1,6 @@
 #ifndef UART_COMM_THREAD_H_
 #define UART_COMM_THREAD_H_
 
-#include "DataLogger.h"
 #include "mbed.h"
 #include "ThreadFlag.h"
 

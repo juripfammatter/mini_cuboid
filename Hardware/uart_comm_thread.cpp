@@ -4,9 +4,6 @@
 
 
 
-extern DataLogger myDataLogger;
-
-
 
 /*
 -------- DATA PROTOCOL----------------------------
