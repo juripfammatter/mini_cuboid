@@ -34,9 +34,9 @@ void ControllerLoop::loop(void){
             printf("ax: %f ay: %f gz: %f phi:%f\r\n",m_sa->get_ax(),m_sa->get_ay(),m_sa->get_gz(),m_sa->get_phi());
 
         // -------------------------------------------------------------
-        m_sa->disable_escon();
+        //m_sa->disable_escon();
         //m_sa->enable_escon();
-        m_sa->write_current(i_des);                   // write to motor 0 
+        //m_sa->write_current(i_des);                   // write to motor 0 
         // handle enable
         }// endof the main loop
 }

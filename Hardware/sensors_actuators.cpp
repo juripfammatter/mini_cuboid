@@ -9,8 +9,8 @@ sensors_actuators::sensors_actuators(float Ts) : di(.05,Ts),counter(PA_8, PA_9),
     i2u.setup(-15,15,0.0f,1.0f);
     //ax2ax.setup(0,1,0,1);     // use these for first time, adapt values according 
     //ay2ay.setup(0,1,0,1);     //              // 
-    ax2ax.setup(-32767,32768,-9.81*2,9.81*2);
-    ay2ay.setup(-17420,15450,-9.81,9.81);
+    ax2ax.setup(-16380,16470,-9.81,9.81);
+    ay2ay.setup(-17500,15350,-9.81,9.81);
     gz2gz.setup(-32767,32768,-1000*PI/180,1000*PI/180);     // check offset (value at standstill)
 // --------------------------------------------------
     button.fall(callback(this, &sensors_actuators::but_pressed));          // attach key pressed function
@@ -44,9 +44,9 @@ void sensors_actuators::disable_escon(void)
     i_enable = 0;    
 }
 
-void sensors_actuators::write_current(float i_des)
+void sensors_actuators::write_current(float _i_des)
 {
-        i_des = i2u(i_des);   
+        i_des = i2u(_i_des);   
 }
 
 float sensors_actuators::get_phi(void)
