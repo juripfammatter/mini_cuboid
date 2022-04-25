@@ -1,6 +1,8 @@
 #include "ControllerLoop.h"
+#include "GPA.h"
 using namespace std;
 
+extern GPA myGPA;      
 
 // contructor for controller loop
 ControllerLoop::ControllerLoop(sensors_actuators *sa, float Ts) : thread(osPriorityHigh,4096)
@@ -28,15 +30,16 @@ void ControllerLoop::loop(void){
         ThisThread::flags_wait_any(threadFlag);
         // THE LOOP ------------------------------------------------------------
         m_sa->read_sensors_calc_speed();       // first read all sensors, calculate mtor speed
+        i_des = myGPA.update(i_des,m_sa->get_vphi_fw());
         est_angle();            // see below, not implemented yet
 
-        if(++k == 0)        
-            printf("ax: %f ay: %f gz: %f phi:%f\r\n",m_sa->get_ax(),m_sa->get_ay(),m_sa->get_gz(),m_sa->get_phi());
+        if(++k == 0)         
+        ;//    printf("ax: %f ay: %f gz: %f phi:%f\r\n",m_sa->get_ax(),m_sa->get_ay(),m_sa->get_gz(),m_sa->get_phi_fw());
 
         // -------------------------------------------------------------
         //m_sa->disable_escon();
         //m_sa->enable_escon();
-        //m_sa->write_current(i_des);                   // write to motor 0 
+        m_sa->write_current(i_des);                   // write to motor 0 
         // handle enable
         }// endof the main loop
 }

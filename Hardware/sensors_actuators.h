@@ -19,8 +19,8 @@ public:
     sensors_actuators(float Ts);        // default constructor
     virtual ~sensors_actuators();   // deconstructor
     void read_sensors_calc_speed(void);       // read both encoders and calculate speeds
-    float get_phi(void);         // get angle of motor k
-    float get_vphi(void);          // get speed of motor k
+    float get_phi_fw(void);         // get angle of motor k
+    float get_vphi_fw(void);          // get speed of motor k
     float get_ax(void);
     float get_ay(void);
     float get_gz(void);
@@ -44,8 +44,8 @@ private:
     Enc_unwrap_scale uw;
     Timer t_but;                            // define button time        // 
     // sensor states
-    float phi;          // motor angle /rad
-    float Vphi;           // motor speed / rad / s
+    float phi_fw;          // motor angle /rad
+    float Vphi_fw;           // motor speed / rad / s
     float accx,accy,gyrz;       // accelerations and gyroscope
     void but_pressed(void);
     void but_released(void);

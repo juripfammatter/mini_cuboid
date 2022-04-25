@@ -8,9 +8,10 @@ sensors_actuators::sensors_actuators(float Ts) : di(.05,Ts),counter(PA_8, PA_9),
 {
     i2u.setup(-15,15,0.0f,1.0f);
     //ax2ax.setup(0,1,0,1);     // use these for first time, adapt values according 
-    //ay2ay.setup(0,1,0,1);     //              // 
-    ax2ax.setup(-16380,16470,-9.81,9.81);
-    ay2ay.setup(-17500,15350,-9.81,9.81);
+    //ay2ay.setup(0,1,0,1);     //              "
+
+    ax2ax.setup(-16000,16800,-9.81,9.81);
+    ay2ay.setup(-17450,15450,-9.81,9.81);
     gz2gz.setup(-32767,32768,-1000*PI/180,1000*PI/180);     // check offset (value at standstill)
 // --------------------------------------------------
     button.fall(callback(this, &sensors_actuators::but_pressed));          // attach key pressed function
@@ -27,8 +28,8 @@ sensors_actuators::~sensors_actuators() {}
 
 void sensors_actuators::read_sensors_calc_speed(void)
 {
-    phi = uw(counter);
-    Vphi = di(phi);
+    phi_fw = uw(counter);
+    Vphi_fw = di(phi_fw);
     //-------------- read imu ------------
     accx = ax2ax(imu.readAcc_raw(1));
     accy = ay2ay(-imu.readAcc_raw(0));
@@ -49,13 +50,13 @@ void sensors_actuators::write_current(float _i_des)
         i_des = i2u(_i_des);   
 }
 
-float sensors_actuators::get_phi(void)
+float sensors_actuators::get_phi_fw(void)
 {
-    return phi;
+    return phi_fw;
 }
-float sensors_actuators::get_vphi(void)
+float sensors_actuators::get_vphi_fw(void)
 {
-    return Vphi;
+    return Vphi_fw;
 }
 float sensors_actuators::get_ax(void)
 {

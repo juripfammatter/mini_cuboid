@@ -1,9 +1,10 @@
 // includes
 #include <cstdint>
 #include "uart_comm_thread.h"
+#include "GPA.h"
 
 
-
+extern GPA myGPA;
 
 /*
 -------- DATA PROTOCOL----------------------------
@@ -94,7 +95,7 @@ void uart_comm_thread::run(void)
     // returnvalue
     bool retVal = false;
 	uint8_t checksum,k;
-	uint16_t send_state =1011;
+	uint16_t send_state =250;
 	while(true)
     	{
         ThisThread::flags_wait_any(threadFlag);
@@ -112,6 +113,28 @@ void uart_comm_thread::run(void)
 			{
 			case 1011:
 				break;	
+			case 250:		// send GPA values
+				if(myGPA.new_data_available)
+					{
+					float dum[8];
+					myGPA.getGPAdata(dum);
+					send(250,1,32,(char *)&(dum[0]));	// send new values (8 floats)
+                    }
+				else if(myGPA.start_now)
+					{
+                    char dum = 0;
+					send(250,2,1,&dum);			// send start flag
+					myGPA.start_now = false;
+					gpa_stop_sent  = false;
+					}
+				else if(myGPA.meas_is_finished && !gpa_stop_sent && !myGPA.new_data_available)
+					{
+                    char dum = 0;
+                    send(250,255,1,&dum);		// send stop flag
+					gpa_stop_sent = true;
+					}
+				send_state = 1011;
+				break;			
 			default:
 				break;
 			}
