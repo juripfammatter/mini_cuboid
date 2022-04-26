@@ -3,7 +3,7 @@
 #define PI 3.1415927
 // constructors
 
-sensors_actuators::sensors_actuators(float Ts) : di(.05,Ts),counter(PA_8, PA_9),
+sensors_actuators::sensors_actuators(float Ts) : di(2*Ts,Ts),counter(PA_8, PA_9),
                             i_enable(PB_1),button(PA_10),i_des(PA_4),uw(4*2048,16),spi(PA_12, PA_11, PA_1),imu(spi, PB_0)
 {
     i2u.setup(-15,15,0.0f,1.0f);

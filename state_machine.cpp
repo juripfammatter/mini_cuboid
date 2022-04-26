@@ -22,6 +22,7 @@ void state_machine::loop(void){
         {
         ThisThread::flags_wait_any(threadFlag);
         // THE LOOP ------------------------------------------------------------
+        // this statemachine is for later use, here, just test sensors
         switch(CS)
             {
             case INIT:
@@ -37,7 +38,7 @@ void state_machine::loop(void){
                 break;
             case FLAT:
                     m_sa->enable_escon();
-                    m_sa->write_current(1);  
+                    m_sa->write_current(1.5);  
                 if(m_sa->key_was_pressed && ti.read()>.5)
                     {
                     printf("switch to BALANCE\r\n");

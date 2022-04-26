@@ -388,8 +388,8 @@ float GPA::update(float inp, float out)
         gpaData.ind++;
         // user info
         if(doPrint) {
-            //printf("%11.4e %9.3e %8.3f %9.3e %8.3f %9.3e %9.3e %9.3e\r\n", gpaData.fexc, gpaData.absGyu, gpaData.angGyu, gpaData.absGyr, gpaData.angGyr, gpaData.Umag, gpaData.Ymag, gpaData.Rmag);
-            new_data_available = true;
+            printf("%11.4e %9.3e %8.3f %9.3e %8.3f %9.3e %9.3e %9.3e\r\n", gpaData.fexc, gpaData.absGyu, gpaData.angGyu, gpaData.absGyr, gpaData.angGyr, gpaData.Umag, gpaData.Ymag, gpaData.Rmag);
+            //new_data_available = true;
         }
         i += 1;
         j = 1;
