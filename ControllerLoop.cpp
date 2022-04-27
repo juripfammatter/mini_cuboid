@@ -33,8 +33,9 @@ void ControllerLoop::loop(void){
         m_sa->read_sensors_calc_speed();       // first read all sensors, calculate mtor speed
         //i_des = myGPA.update(i_des,m_sa->get_vphi_fw());
         est_angle();            // see below, not implemented yet
-        if(++k == 0)         
-            printf("ax: %f ay: %f gz: %f phi:%f\r\n",m_sa->get_ax(),m_sa->get_ay(),m_sa->get_gz(),m_sa->get_phi_fw());
+        //if(++k == 0)         
+          //  printf("ax: %f ay: %f gz: %f phi:%f\r\n",m_sa->get_ax(),m_sa->get_ay(),m_sa->get_gz(),m_sa->get_phi_fw());
+        printf("%f %f\r\n",m_sa->get_ax(),m_sa->get_ay());
 
         // -------------------------------------------------------------
         //m_sa->enable_escon();
