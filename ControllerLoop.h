@@ -35,4 +35,5 @@ private:
     void sendSignal();
     float est_angle();
     sensors_actuators *m_sa;
+    float saturate(float,float,float);
 };
