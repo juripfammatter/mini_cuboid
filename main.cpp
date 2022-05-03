@@ -8,7 +8,6 @@
 
 
 static BufferedSerial serial_port(USBTX, USBRX);
-
 float Ts = 0.002f;    // sampling time, typically approx 1/500
 GPA          myGPA( .7,  250,    30,4,4, Ts); // para for plant
 

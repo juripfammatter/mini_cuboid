@@ -34,7 +34,7 @@ void ControllerLoop::loop(void){
         //i_des = myGPA.update(i_des,m_sa->get_vphi_fw());
         est_angle();            // see below, not implemented yet
         if(++k == 0)         
-            printf("ax: %f ay: %f gz: %f phi:%f\r\n",m_sa->get_ax(),m_sa->get_ay(),m_sa->get_gz(),m_sa->get_phi_fw());
+            printf("ax: %f ay: %f gz: %f phi:%f\r\n",m_sa->get_ax(),m_sa->get_ay(),m_sa->get_gz(),m_sa->get_phi_bd());
 
         // -------------------------------------------------------------
         //m_sa->enable_escon();
