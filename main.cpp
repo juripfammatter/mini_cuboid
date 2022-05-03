@@ -24,6 +24,8 @@ int main()
     ControllerLoop loop(&hardware,Ts);       // this is for the main controller loop
     state_machine sm(&hardware,&loop,0.02);
     ThisThread::sleep_for(200);
+    uint32_t *uid = (uint32_t *)0x1FFF7590;
+    printf("\r\nUnique ID: %08X %08X %08X \r\n", uid[0], uid[1], uid[2]);
 // ----------------------------------
     ThisThread::sleep_for(20);
     loop.start_loop();
