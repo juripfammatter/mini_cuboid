@@ -9,7 +9,7 @@
 
 static BufferedSerial serial_port(USBTX, USBRX);
 
-float Ts = 0.02f;    // sampling time, typically approx 1/500
+float Ts = 0.002f;    // sampling time, typically approx 1/500
 GPA          myGPA( .7,  250,    30,4,4, Ts); // para for plant
 
 //******************************************************************************
@@ -22,7 +22,7 @@ int main()
     // --------- mini cuboid,
     sensors_actuators hardware(Ts);         // in this class all the physical ios are handled
     ControllerLoop loop(&hardware,Ts);       // this is for the main controller loop
-    state_machine sm(&hardware,&loop,0.02);
+    state_machine sm(&hardware,&loop,0.01);
     ThisThread::sleep_for(200);
     uint32_t *uid = (uint32_t *)0x1FFF7590;
     printf("\r\nUnique ID: %08X %08X %08X \r\n", uid[0], uid[1], uid[2]);
