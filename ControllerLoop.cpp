@@ -10,7 +10,8 @@ ControllerLoop::ControllerLoop(sensors_actuators *sa, float Ts) : thread(osPrior
 {
     this->Ts = Ts;
     this->m_sa = sa;
-    bal_vel_cntrl.setCoefficients((-3.69e-05)*4, (-1.84e-05)*4,0,1,Ts,-.1,.1);  // based on torque, max. 1 Amp
+    //bal_vel_cntrl.setCoefficients(-0.000221, -0.000554,0,1,Ts,-.1,.1);  // based on torque, max. 1 Amp
+    bal_vel_cntrl.setCoefficients(0, 1,0,1,Ts,-.1,.1);  // based on torque, max. 1 Amp
     flat_vel_cntrl.setCoefficients(.8,40, 0, 1, Ts, -5, 5);
     bal_cntrl_enabled = false;
     flat_vel_cntrl_enabled = false;
@@ -31,7 +32,7 @@ void ControllerLoop::loop(void){
     float km = 36.9e-3;
     float om = 6.5973;//2*PI/((2*60)/126); // 126 BPM
     float V =  -1.2153; // static prefilter
-    float M_add;
+    float I_part;
     while(1)
         {
         ThisThread::flags_wait_any(threadFlag);
@@ -40,13 +41,11 @@ void ControllerLoop::loop(void){
         m_sa->read_sensors_calc_estimates();       // first read all sensors, calculate mtor speed
         //i_des = myGPA.update(i_des,m_sa->get_vphi_fw());
         float phi_bd = m_sa->get_phi_bd();            // see below, not implemented yet
-        //float Kmat[2] = {-1.4073,   -0.0875};
-        float Kmat[2] = {-1.7436  , -0.1296};
+        float Kmat[4] = { -5.1971,-0.4820,-0.0165,0.0500};
         if(bal_cntrl_enabled)
             {
-                float M_des = -(Kmat[0]*(phi_bd-phi_bd_des) + Kmat[1] * m_sa->get_gz());
-                M_add = bal_vel_cntrl(-m_sa->get_vphi_fw());
-                M_des += M_add;    // the velocity cntrl. is based on torque input!
+                I_part = bal_vel_cntrl(-m_sa->get_vphi_fw());
+                float M_des = -(Kmat[0]*(phi_bd-phi_bd_des) + Kmat[1] * m_sa->get_gz() + Kmat[2]*saturate(m_sa->get_vphi_fw(),-25,25)+Kmat[3]*I_part);
                 i_des = saturate(M_des/km,-13,13);    // need at least 9 Amps to lift up!
                 m_sa->enable_escon();       
             }
@@ -63,7 +62,7 @@ void ControllerLoop::loop(void){
                     {
                     //printf("ax: %f ay: %f gz: %f phi_fw :%f phi_bd :%f\r\n",m_sa->get_ax(),m_sa->get_ay(),m_sa->get_gz(),m_sa->get_phi_fw(),m_sa->get_phi_bd());
                     //printf("%f %f %f %f %f\r\n",ti.read(),m_sa->get_ax(),m_sa->get_ay(),m_sa->get_gz(),m_sa->get_phi_bd());
-                    printf("%f %f %f %f\r\n",tim,m_sa->get_phi_bd(),M_add,m_sa->get_vphi_fw());
+                    printf("%f %f %f %f\r\n",tim,m_sa->get_phi_bd(),I_part,m_sa->get_vphi_fw());
                     //printf("%f %f %f %f\r\n",ti.read(),m_sa->get_vphi_fw(),m_sa->get_gz(),m_sa->get_phi_fw());
                     k=0;
                     }
