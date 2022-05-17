@@ -49,7 +49,7 @@ private:
     float phi_fw;          // motor angle /rad
     float phi_bd;           // body angle / rad
     float Vphi_fw;           // motor speed / rad / s
-    float accx,accy,gyrz;       // accelerations and gyroscope
+    float accx,accy,gyrz,gyrz_fil;       // accelerations and gyroscope
     void but_pressed(void);
     void but_released(void);
 

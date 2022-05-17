@@ -40,10 +40,11 @@ void sensors_actuators::read_sensors_calc_speed(void)
     //-------------- read imu ------------
     accx = fil_ax(ax2ax(imu.readAcc_raw(1)));
     accy = fil_ay(ay2ay(-imu.readAcc_raw(0)));
-    gyrz = fil_gz(gz2gz(imu.readGyro_raw(2)));
+    gyrz = gz2gz(imu.readGyro_raw(2));
+    gyrz_fil = fil_gz(gyrz);
     // ------------------------------------
     //phi_bd = atan2(accx,accy);
-    phi_bd = atan2(accx,accy) + gyrz - PI/4;
+    phi_bd = atan2(accx,accy) + gyrz_fil - PI/4;
 
 }
 
