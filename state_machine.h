@@ -5,6 +5,8 @@
 #define INIT 1
 #define FLAT 2
 #define BALANCE 3
+#define DOWN_R 4
+#define DOWN_L 5
 
 
 // This is the loop class, it is not a controller at first hand, it guarantees a cyclic call

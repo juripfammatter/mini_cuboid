@@ -17,7 +17,7 @@ state_machine::~state_machine() {}
 
 // ----------------------------------------------------------------------------
 void state_machine::loop(void){
-    
+    float down_speed = 1.1;
     while(1)
         {
         ThisThread::flags_wait_any(threadFlag);
@@ -28,23 +28,21 @@ void state_machine::loop(void){
             case INIT:
                 if(m_sa->key_was_pressed && ti.read()>.5)
                     {
-                    printf("switch to FLAT, rotate\r\n");
+                    printf("switch to FLAT\r\n");
                     m_sa->enable_escon();
-                    m_sa->write_current(1);  
+                    m_loop->enable_vel_cntrl();
                     m_sa->key_was_pressed = false;
                     ti.reset();
                     CS = FLAT;
                     }
                 break;
-            case FLAT:
-                    m_sa->enable_escon();
-                    m_sa->write_current(1.5);  
+            case FLAT: 
                 if(m_sa->key_was_pressed && ti.read()>.5)
                     {
                     printf("switch to BALANCE\r\n");
-                    m_sa->disable_escon();
-                    m_sa->write_current(0);
                     m_sa->key_was_pressed = false;
+                    m_loop->reset_cntrl();
+                    m_loop->enable_bal_cntrl();
                     CS = BALANCE;
                     ti.reset();
                     }
@@ -54,8 +52,19 @@ void state_machine::loop(void){
                     {
                     printf("switch to INIT\r\n");
                     m_sa->key_was_pressed = false;
-                    CS = INIT;
+                    CS = DOWN_R;
                     ti.reset();
+                    }
+                break;
+            case DOWN_R:
+                m_loop->phi_bd_des += down_speed*Ts;
+                if(ti.read()>0.7)
+                    {
+                    m_loop->disable_all_cntrl();
+                    m_loop->enable_vel_cntrl();
+                    m_loop->phi_bd_des = 0;
+                    CS = FLAT;
+                    ti.reset();                    
                     }
                 break;
             default:

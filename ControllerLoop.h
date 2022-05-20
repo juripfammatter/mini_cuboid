@@ -20,6 +20,7 @@ public:
     void enable_bal_cntrl(void);
     void reset_cntrl(void);
     void disable_all_cntrl();
+    float phi_bd_des;
 
 private:
     void loop(void);
@@ -28,11 +29,12 @@ private:
     ThreadFlag threadFlag;
     Timer ti;
     PID_Cntrl flat_vel_cntrl;
-    PID_Cntrl bal_vel_cntrl;
+    PID_Cntrl I_cntrl;
     float Ts;
     bool bal_cntrl_enabled;
     bool vel_cntrl_enabled;
     void sendSignal();
     float est_angle();
     sensors_actuators *m_sa;
+    float saturate(float,float,float);
 };
