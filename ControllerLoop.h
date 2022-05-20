@@ -14,7 +14,7 @@ class ControllerLoop
 {
 public:
     ControllerLoop(sensors_actuators *,float Ts);
-    virtual     ~ControllerLoop();
+    virtual ~ControllerLoop();
     void start_loop(void);
     void enable_vel_cntrl(void);
     void enable_bal_cntrl(void);

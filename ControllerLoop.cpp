@@ -10,8 +10,7 @@ ControllerLoop::ControllerLoop(sensors_actuators *sa, float Ts) : thread(osPrior
     bal_cntrl_enabled = false;
     vel_cntrl_enabled = false;
     I_cntrl.setup(0, 1, 0, 1, Ts, -3, 3);// limits are set: M_max/10/K4[3] = 0.5/10/0.0074
-    flat_vel_cntrl.setup(0.0316,1.58,0,1,Ts,-0.2,.2);
-    //bal_vel_cntrl.setup(...);
+    flat_vel_cntrl.setup(0.0316,1.58,0,1,Ts,-0.2,.2); // see Matlab code in main
     m_sa->disable_escon();
     phi_bd_des = 0;
     ti.reset();
@@ -20,14 +19,13 @@ ControllerLoop::ControllerLoop(sensors_actuators *sa, float Ts) : thread(osPrior
 
 // decontructor for controller loop
 ControllerLoop::~ControllerLoop() {}
-
 // ----------------------------------------------------------------------------
 // this is the main loop called every Ts with high priority
 void ControllerLoop::loop(void){
     float i_des = 0;
     uint8_t k = 0;
     float K[2] = {-1.3924, -0.0864};
-    float K4[4] = {-2.9532, -0.2878, -0.0086,0.0074};
+    float K4[4] = {-2.9527,-0.2872,-0.008,0.0069};
     float M_des;
     float km = 36.9E-3; // Motor constant Nm/Amp
     while(1)
@@ -43,9 +41,7 @@ void ControllerLoop::loop(void){
             M_des = flat_vel_cntrl(0 - m_sa->get_vphi_fw());
         else
             M_des = 0;
-        // -------------------------------------------------------------
         m_sa->write_current(M_des/km);                   // write to motor 0 
-        // handle enable
         }// endof the main loop
 }
 
@@ -56,14 +52,6 @@ void ControllerLoop::start_loop(void)
 {
     thread.start(callback(this, &ControllerLoop::loop));
     ticker.attach(callback(this, &ControllerLoop::sendSignal), Ts);
-}
-
-/* est_angle: estimate angle from acc and gyro data. This function would also fit to the "sensors_actuators"- class
-but here it is better visible for students. 
-*/
-float ControllerLoop::est_angle(void)
-{
-    return 0;
 }
 
 void ControllerLoop::enable_vel_cntrl(void)

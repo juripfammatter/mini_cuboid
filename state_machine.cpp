@@ -1,7 +1,7 @@
 #include "state_machine.h"
 using namespace std;
 
-// contructor for controller loop
+// contructor for state_machine
 state_machine::state_machine(sensors_actuators *sa, ControllerLoop *loop, float Ts) : thread(osPriorityNormal,4096)
 {
     this->Ts = Ts;
@@ -10,11 +10,9 @@ state_machine::state_machine(sensors_actuators *sa, ControllerLoop *loop, float 
     this->m_loop = loop;
     ti.reset();
     ti.start();
-    }
+}
 
-// decontructor for controller loop
 state_machine::~state_machine() {}
-
 // ----------------------------------------------------------------------------
 void state_machine::loop(void){
     float down_speed = 1.1;
