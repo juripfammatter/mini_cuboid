@@ -5,6 +5,13 @@
 #include "sensors_actuators.h"
 #include "state_machine.h"
 #include "GPA.h"
+#include "minicube_parametermap.h"
+/*
+example: 
+*/
+
+
+
 // Mini-cuboid for lab, see Matlab-code at end of this file
 static BufferedSerial serial_port(USBTX, USBRX);
 float Ts = 0.002f;    // sampling time, typically approx 1/500

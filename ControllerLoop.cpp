@@ -57,10 +57,12 @@ void ControllerLoop::start_loop(void)
 void ControllerLoop::enable_vel_cntrl(void)
 {
     vel_cntrl_enabled = true;
+    bal_cntrl_enabled = false;
 }
 void ControllerLoop::enable_bal_cntrl(void)
 {
     bal_cntrl_enabled = true;
+    vel_cntrl_enabled = false;
 }
 void ControllerLoop::reset_cntrl(void)
 {
