@@ -1,75 +1,47 @@
 #include "ControllerLoop.h"
 #include "GPA.h"
-#define PI 3.1415927
 using namespace std;
-
-extern GPA myGPA;      
 
 // contructor for controller loop
 ControllerLoop::ControllerLoop(sensors_actuators *sa, float Ts) : thread(osPriorityHigh,4096)
 {
     this->Ts = Ts;
     this->m_sa = sa;
-    //bal_vel_cntrl.setCoefficients(-0.000221, -0.000554,0,1,Ts,-.1,.1);  // based on torque, max. 1 Amp
-    bal_vel_cntrl.setCoefficients(0, 1,0,1,Ts,-.1,.1);  // based on torque, max. 1 Amp
-    flat_vel_cntrl.setCoefficients(.8,40, 0, 1, Ts, -5, 5);
     bal_cntrl_enabled = false;
-    flat_vel_cntrl_enabled = false;
-    phi_bd_des = -PI/4;
+    vel_cntrl_enabled = false;
+    I_cntrl.setup(0, 1, 0, 1, Ts, -3, 3);// limits are set: M_max/10/K4[3] = 0.5/10/0.0074
+    flat_vel_cntrl.setup(0.0316,1.58,0,1,Ts,-0.2,.2); // see Matlab code in main
     m_sa->disable_escon();
+    phi_bd_des = 0;
     ti.reset();
     ti.start();
     }
 
 // decontructor for controller loop
 ControllerLoop::~ControllerLoop() {}
-
 // ----------------------------------------------------------------------------
 // this is the main loop called every Ts with high priority
 void ControllerLoop::loop(void){
     float i_des = 0;
     uint8_t k = 0;
-    float km = 36.9e-3;
-    float om = 6.5973;//2*PI/((2*60)/126); // 126 BPM
-    float V =  -1.2153; // static prefilter
-    float I_part;
+    float K[2] = {-1.3924, -0.0864};
+    float K4[4] = {-2.9527,-0.2872,-0.008,0.0069};
+    float M_des;
+    float km = 36.9E-3; // Motor constant Nm/Amp
     while(1)
         {
         ThisThread::flags_wait_any(threadFlag);
         // THE LOOP ------------------------------------------------------------
-        float tim = ti.read();
-        m_sa->read_sensors_calc_estimates();       // first read all sensors, calculate mtor speed
-        //i_des = myGPA.update(i_des,m_sa->get_vphi_fw());
-        float phi_bd = m_sa->get_phi_bd();            // see below, not implemented yet
-        float Kmat[4] = { -5.1971,-0.4820,-0.0165,0.0500};
+        m_sa->read_sensors_calc_speed();       // first read all sensors, calculate mtor speed
+        //if(++k == 0)         
+        //    printf("ax: %f ay: %f gz: %f phi:%f\r\n",m_sa->get_ax(),m_sa->get_ay(),m_sa->get_gz(),m_sa->get_phi_bd());
         if(bal_cntrl_enabled)
-            {
-                I_part = bal_vel_cntrl(-m_sa->get_vphi_fw());
-                float M_des = -(Kmat[0]*(phi_bd-phi_bd_des) + Kmat[1] * m_sa->get_gz() + Kmat[2]*saturate(m_sa->get_vphi_fw(),-25,25)+Kmat[3]*I_part);
-                i_des = saturate(M_des/km,-13,13);    // need at least 9 Amps to lift up!
-                m_sa->enable_escon();       
-            }
-        else if(flat_vel_cntrl_enabled)
-            {
-                i_des = flat_vel_cntrl(-m_sa->get_vphi_fw());
-            }
+            M_des = -(K4[0]* (m_sa->get_phi_bd()-phi_bd_des) + K4[1]*m_sa->get_gz() +K4[2] * saturate(m_sa->get_vphi_fw(),-50,50) + K4[3] * I_cntrl(0-m_sa->get_vphi_fw()));
+        else if(vel_cntrl_enabled)
+            M_des = flat_vel_cntrl(0 - m_sa->get_vphi_fw());
         else
-            {
-                i_des = 0.0;
-                m_sa->disable_escon();      
-            }
-        if(++k >= 200)          
-                    {
-                    //printf("ax: %f ay: %f gz: %f phi_fw :%f phi_bd :%f\r\n",m_sa->get_ax(),m_sa->get_ay(),m_sa->get_gz(),m_sa->get_phi_fw(),m_sa->get_phi_bd());
-                    //printf("%f %f %f %f %f\r\n",ti.read(),m_sa->get_ax(),m_sa->get_ay(),m_sa->get_gz(),m_sa->get_phi_bd());
-                    printf("%f %f %f %f\r\n",tim,m_sa->get_phi_bd(),I_part,m_sa->get_vphi_fw());
-                    //printf("%f %f %f %f\r\n",ti.read(),m_sa->get_vphi_fw(),m_sa->get_gz(),m_sa->get_phi_fw());
-                    k=0;
-                    }
-        // -------------------------------------------------------------
-        //m_sa->enable_escon();
-        m_sa->write_current(i_des);                   // write to motor 0 
-        // handle enable
+            M_des = 0;
+        m_sa->write_current(M_des/km);                   // write to motor 0 
         }// endof the main loop
 }
 
@@ -82,31 +54,32 @@ void ControllerLoop::start_loop(void)
     ticker.attach(callback(this, &ControllerLoop::sendSignal), Ts);
 }
 
-void ControllerLoop::enable_flat_vel_cntrl(void)
+void ControllerLoop::enable_vel_cntrl(void)
 {
-    flat_vel_cntrl_enabled = true;
-    m_sa->enable_escon();
+    vel_cntrl_enabled = true;
+    bal_cntrl_enabled = false;
 }
 void ControllerLoop::enable_bal_cntrl(void)
 {
     bal_cntrl_enabled = true;
-    m_sa->enable_escon();
+    vel_cntrl_enabled = false;
 }
 void ControllerLoop::reset_cntrl(void)
 {
+    I_cntrl.reset(0);
     flat_vel_cntrl.reset(0);
-    bal_vel_cntrl.reset(0);
 }
 void ControllerLoop::disable_all_cntrl()
 {
     bal_cntrl_enabled = false;
-    flat_vel_cntrl_enabled = false;
+    vel_cntrl_enabled = false;
 }
-float ControllerLoop::saturate(float x,float lo,float up)
+float ControllerLoop::saturate(float x,float ll, float ul)
 {
-    if(x < lo)
-        return lo;
-    else if(x > up)
-        return up;
-    return x;
+if(x>ul)
+    return ul;
+else if(x<ll)
+    return ll;
+else 
+    return x; 
 }

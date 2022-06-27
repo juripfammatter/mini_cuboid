@@ -2,11 +2,18 @@
 #include "sensors_actuators.h"
 #include "ControllerLoop.h"
 
-#define INIT 1
-#define FLAT 2
-#define BALANCE 3
-#define SWD_POS 4
-#define SWD_NEG 5
+#define PI 3.1415927
+
+#define INIT 11
+#define FLAT 21
+#define BALANCE 2
+#define WIGGLE_SLOW 3
+#define WIGGLE_FAST 4
+#define WALK_LEFT 5
+#define WALK_RIGHT 6
+#define DOWN_L 51
+#define DOWN_R 61
+#define READ_IMU 99
 
 
 
@@ -21,13 +28,15 @@ public:
 private:
     void loop(void);
     uint8_t CS;             // the current state
+    uint8_t C_SS;             // the current state
     Thread thread;
     Ticker ticker;
     ThreadFlag threadFlag;
-    Timer ti;
+    Timer lti;
+    Timer gti;
     float Ts;
-    float phi_target;
     void sendSignal();
     sensors_actuators *m_sa;
     ControllerLoop *m_loop;
+    bool detect_on_edge();
 };

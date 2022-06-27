@@ -14,26 +14,25 @@ class ControllerLoop
 {
 public:
     ControllerLoop(sensors_actuators *,float Ts);
-    virtual     ~ControllerLoop();
+    virtual ~ControllerLoop();
     void start_loop(void);
-    void enable_flat_vel_cntrl(void);
+    void enable_vel_cntrl(void);
     void enable_bal_cntrl(void);
     void reset_cntrl(void);
     void disable_all_cntrl();
     float phi_bd_des;
-        
 
-private: 
+private:
     void loop(void);
     Thread thread;
     Ticker ticker;
     ThreadFlag threadFlag;
     Timer ti;
     PID_Cntrl flat_vel_cntrl;
-    PID_Cntrl bal_vel_cntrl;
+    PID_Cntrl I_cntrl;
     float Ts;
     bool bal_cntrl_enabled;
-    bool flat_vel_cntrl_enabled;
+    bool vel_cntrl_enabled;
     void sendSignal();
     float est_angle();
     sensors_actuators *m_sa;

@@ -1,75 +1,99 @@
 #include "state_machine.h"
 using namespace std;
-#define PI 3.1415927
-// contructor for controller loop
+
+// contructor for state_machine
 state_machine::state_machine(sensors_actuators *sa, ControllerLoop *loop, float Ts) : thread(osPriorityNormal,4096)
 {
     this->Ts = Ts;
-    this->CS = INIT;
+    this->CS = READ_IMU;
     this->m_sa = sa;
     this->m_loop = loop;
-    this->phi_target = -PI/4;
-    ti.reset();
-    ti.start();
-    }
+    gti.reset();
+    gti.start();
+}
 
-// decontructor for controller loop
 state_machine::~state_machine() {}
-
 // ----------------------------------------------------------------------------
 void state_machine::loop(void){
-    float om = 2*PI/.8;
+    float down_speed = 1.1;
+    float bar2sec = 2.1f;
     while(1)
         {
         ThisThread::flags_wait_any(threadFlag);
         // THE LOOP ------------------------------------------------------------
         // this statemachine is for later use, here, just test sensors
-        float tim = ti.read();
+        uint8_t old_state = CS;
+        //CS = bar2sec * gti.read(); 
+        if(old_state != CS)
+        {
+            C_SS = 0;
+            lti.reset();
+        }
         switch(CS)
             {
             case INIT:
-                if(m_sa->key_was_pressed && tim >.5)
+                if(m_sa->key_was_pressed && gti.read()>.5)
                     {
-                    printf("switch to FLAT, rotate\r\n");
-                    m_loop->start_loop();
+                    printf("switch to FLAT\r\n");
+                    m_sa->enable_escon();
+                    m_loop->enable_vel_cntrl();
                     m_sa->key_was_pressed = false;
-                    m_loop->enable_flat_vel_cntrl();
-                    ti.reset();
+                    gti.reset();
                     CS = FLAT;
                     }
                 break;
-            case FLAT:
-                if(tim>5)
+            case FLAT: 
+                if(m_sa->key_was_pressed && gti.read()>.5)
                     {
                     printf("switch to BALANCE\r\n");
-                    phi_target += PI/4;
-                    m_loop->phi_bd_des += PI/4;
+                    m_sa->key_was_pressed = false;
                     m_loop->reset_cntrl();
                     m_loop->enable_bal_cntrl();
                     CS = BALANCE;
-                    ti.reset();
                     }
                 break;
             case BALANCE:
-                if(tim>5)
+                if(m_sa->key_was_pressed && gti.read()>.5)
                     {
-                    printf("switch to SWD\r\n");
-                    CS = SWD_POS;
-                    phi_target += PI/4;
-                    ti.reset();
+                    printf("switch to INIT\r\n");
+                    m_sa->key_was_pressed = false;
+                    CS = DOWN_R;
+                    lti.reset();
                     }
                 break;
-            case SWD_POS:
-                m_loop->phi_bd_des = -PI/8*(cos(om*tim)-1.0f) +phi_target-PI/4.0f;
-                //printf("%f ",m_loop->phi_bd_des);
-                if(fabs(phi_target - m_sa->get_phi_bd())<.1 || tim>.4)
+            case WALK_LEFT:
+                switch(C_SS)
+                    {
+                    case 0:
+                        if(detect_on_edge())
+                            {
+                            C_SS = BALANCE;
+                             m_loop->enable_bal_cntrl();
+                            }
+                        else
+                            {
+                            C_SS = FLAT;
+                            m_loop->enable_vel_cntrl();
+                            }
+                        break;
+                    
+                        if(lti.read()*bar2sec)
+                        ;
+                    }
+                break;
+            case DOWN_R:
+                m_loop->phi_bd_des += down_speed*Ts;
+                if(gti.read()>0.7)
                     {
                     m_loop->disable_all_cntrl();
-                    m_loop->enable_flat_vel_cntrl();
-                    m_loop->phi_bd_des = phi_target;
+                    m_loop->enable_vel_cntrl();
+                    m_loop->phi_bd_des = 0;
                     CS = FLAT;
-                    ti.reset();
+                    gti.reset();                    
                     }
+                break;
+            case READ_IMU:
+                printf("%f %f %f\r\n",m_sa->get_ax_raw(),m_sa->get_ay_raw(),m_sa->get_az_raw());
                 break;
             default:
                 break;
@@ -84,4 +108,11 @@ void state_machine::start_loop(void)
 {
     thread.start(callback(this, &state_machine::loop));
     ticker.attach(callback(this, &state_machine::sendSignal), Ts);
+}
+bool state_machine::detect_on_edge(void)
+{
+    if(0)//(fabs((m_sa->get_phi_fw()*2)%(PI))<.5)
+        return true;
+    else
+        return false;
 }
