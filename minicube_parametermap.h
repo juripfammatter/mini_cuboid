@@ -3,7 +3,7 @@
 #include <map>
 
 enum {
-	BLACK_1 = 0xA1428DD0,
+	BLACK_1 = 201,
 	BLACK_2,
 	BLACK_3,
 	BLACK_4,
@@ -54,10 +54,11 @@ static std::map<unsigned long long, minicube_t> minicube_map = {
 	{0x53325006005A004A, {.modell_name = RED_2, .imu_acc_x_m1g = -15700.00, .imu_acc_x_p1g = 17140.00, .imu_acc_y_m1g = -17370.00, .imu_acc_y_p1g = 15480.00}},
 	{0x5332500600300026, {.modell_name = RED_3, .imu_acc_x_m1g = -16200.00, .imu_acc_x_p1g = 16640.00, .imu_acc_y_m1g = -17290.00, .imu_acc_y_p1g = 15535.00}},
 	{0x5332500500370056, {.modell_name = RED_4, .imu_acc_x_m1g = -16090.00, .imu_acc_x_p1g = 16620.00, .imu_acc_y_m1g = -16700.00, .imu_acc_y_p1g = 16090.00}},
-	{0x5332500500550057, {.modell_name = ORANGE_1, .imu_acc_x_m1g = -16350.00, .imu_acc_x_p1g = 16545.00, .imu_acc_y_m1g = -17190.00, .imu_acc_y_p1g = 15632.00}},
+	{0x53325005004B0069, {.modell_name = ORANGE_1, .imu_acc_x_m1g = -16110.00, .imu_acc_x_p1g = 16726.00, .imu_acc_y_m1g = -16690.00, .imu_acc_y_p1g = 16155.00}},
 	{0x5332500600460037, {.modell_name = ORANGE_2, .imu_acc_x_m1g = -16200.00, .imu_acc_x_p1g = 16630.00, .imu_acc_y_m1g = -17474.00, .imu_acc_y_p1g = 15420.00}},
 	{0x5956501900490036, {.modell_name = ORANGE_3, .imu_acc_x_m1g = -16040.00, .imu_acc_x_p1g = 16824.00, .imu_acc_y_m1g = -17380.00, .imu_acc_y_p1g = 15440.00}},
 	{0x53325006005D0027, {.modell_name = ORANGE_4, .imu_acc_x_m1g = -16000.00, .imu_acc_x_p1g = 16800.00, .imu_acc_y_m1g = -17200.00, .imu_acc_y_p1g = 15600.00}},
 };
+
 
 static minicube_t MINICUBE(minicube_map[mcu_uid]);

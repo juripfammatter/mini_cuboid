@@ -21,7 +21,7 @@ public:
     void reset_cntrl(void);
     void disable_all_cntrl();
     float phi_bd_des;
-
+ 
 private:
     void loop(void);
     Thread thread;
@@ -31,6 +31,7 @@ private:
     PID_Cntrl flat_vel_cntrl;
     PID_Cntrl I_cntrl;
     float Ts;
+    float km = 36.9E-3; // Motor constant Nm/Amp
     bool bal_cntrl_enabled;
     bool vel_cntrl_enabled;
     void sendSignal();

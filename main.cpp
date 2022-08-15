@@ -7,7 +7,16 @@
 #include "GPA.h"
 #include "minicube_parametermap.h"
 /*
-example: 
+software (running) for "Nacht der Technik" July 2022. Concept
+    - 2 types of controllers running in ControllerLoop.cpp at 500Hz
+        * balance controller at unstable position on edge
+        * PI-controller to keep disc speed at 0, when lying on edge
+    - controllers are enabled/disabled in state_machine.cpp
+    - main things are performed in state_machine.cpp
+    - each cuboid has the same software!
+    - individual cuboids are identified by their ID number (see lines below in main.cpp)
+    - choreography is read in choreography.h
+    - choreography.h is created with Matlab: generateChoreography.m
 */
 
 
@@ -26,7 +35,8 @@ int main()
     state_machine sm(&hardware,&loop,0.02);
     ThisThread::sleep_for(200);
     uint32_t *uid = (uint32_t *)0x1FFF7590;
-    printf("\r\nUnique ID: %08X %08X %08X \r\n", uid[0], uid[1], uid[2]);
+//    printf("\r\nUnique ID: %08X %08X %08X \r\n", uid[0], uid[1], uid[2]);
+    printf("\r\nUnique ID: %08X %08X \r\n", uid[1], uid[0]);
 // ----------------------------------
     ThisThread::sleep_for(20);
     loop.start_loop();

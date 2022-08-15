@@ -10,7 +10,10 @@ Tasks for students:
 #include "IIR_filter.h"
 #include "LinearCharacteristics.h"
 #include "Enc_unwrap_scale.h"
+#include "unwrap_2pi.h"
 #include "mpu6500_spi.h"
+#include "minicube_parametermap.h"
+#define MAX_FW_SPEED 420
 
 
 class sensors_actuators
@@ -29,10 +32,13 @@ public:
     void enable_escon();
     void disable_escon();
     bool key_was_pressed;
+    float ax_fil,ay_fil;
+    void force_curr(float);
    
 private:
     IIR_filter di;
-    IIR_filter fil_ax,fil_ay,fil_gz;
+    IIR_filter fil_ax,fil_ay,fil_gz, dif_ax, dif_ay;
+
     ///------------- Encoder -----------------------
     EncoderCounter counter;    // initialize counter on PA_6 and PC_7
     AnalogOut i_des;           // desired current values
@@ -44,6 +50,7 @@ private:
     LinearCharacteristics i2u;
     LinearCharacteristics ax2ax,ay2ay,gz2gz;    // map imu raw values to m/s^2 and rad/s
     Enc_unwrap_scale uw;
+    unwrap_2pi uw2pi;
     Timer t_but;                            // define button time        // 
     // sensor states
     float phi_fw;          // motor angle /rad
@@ -52,5 +59,6 @@ private:
     float accx,accy,gyrz,gyrz_fil;       // accelerations and gyroscope
     void but_pressed(void);
     void but_released(void);
+    bool global_enable;
 
 };
