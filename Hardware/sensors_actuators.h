@@ -31,10 +31,9 @@ public:
     void write_current(float);  // write current to motors (0,...) for motor 1, (1,...) for motor 2
     void enable_escon();
     void disable_escon();
-    bool key_was_pressed;
     float ax_fil,ay_fil;
     void force_curr(float);
-   
+    bool get_but(void);
 private:
     IIR_filter di;
     IIR_filter fil_ax,fil_ay,fil_gz, dif_ax, dif_ay;
@@ -60,5 +59,6 @@ private:
     void but_pressed(void);
     void but_released(void);
     bool global_enable;
-
+    bool key_was_pressed;
+    
 };

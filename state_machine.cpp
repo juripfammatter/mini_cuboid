@@ -159,7 +159,7 @@ void state_machine::loop(void){
                     CS = IDLE;
                 break;
             case IDLE:
-                if(m_sa->ax_fil > AX_LIMIT)
+                if(m_sa->get_but())//ax_fil > AX_LIMIT)
                     {
                     gti.reset();
                     m_sa->force_curr(0);

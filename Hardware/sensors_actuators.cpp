@@ -122,3 +122,14 @@ void sensors_actuators::but_released()
     if(ButtonTime > 0.05f && ButtonTime < 0.5) 
         key_was_pressed = true;
 }
+bool sensors_actuators::get_but()
+{
+     // readout, stop and reset timer
+    if(key_was_pressed)
+        {
+            key_was_pressed = false;
+            return true;
+        }
+    else
+        return false;
+}
