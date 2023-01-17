@@ -1,19 +1,14 @@
 // Linear Characteristics for different purposes (map Voltage to acc etc.)
-
-
-#ifndef LINEAR_CHARACTERISTICS_H_
-#define LINEAR_CHARACTERISTICS_H_   
-
-
+#pragma once
 class LinearCharacteristics{
      public:
-            LinearCharacteristics(){};
-            LinearCharacteristics(float, float);
-            float evaluate(float);
-            float operator()(float x){
+            LinearCharacteristics(){};              // default constructor
+            LinearCharacteristics(float, float);    // constructor with gain and offset
+            float evaluate(float);                  // calculate y(x)
+            float operator()(float x){              // calculate with () operator
                 return evaluate(x);
                 } 
-            virtual     ~LinearCharacteristics();
+            virtual     ~LinearCharacteristics();   // deconstructor
                 
     private:
         // here: private functions and values...
@@ -22,6 +17,3 @@ class LinearCharacteristics{
         float ulim;
         float llim;
 };
-
-
-#endif      // LINEAR_CHARACTERISTICS_H_
