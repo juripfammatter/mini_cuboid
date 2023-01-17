@@ -44,15 +44,7 @@ void PID_Cntrl::reset(float initValue)
 
 float PID_Cntrl::update(float e)
 {
-    // the main update 
-    float Ppart = kp * e;
-    Ipart = Ipart + ki*Ts/2.0f * ( e + e_old);
-    e_old = e;
-    Ipart = saturate(Ipart);
-    Dpart = 0;      // will follow
-
-   return saturate(Ppart + Ipart + Dpart); 
-   
+   return 0;   
 }
 
 float PID_Cntrl::saturate(float x)

@@ -7,7 +7,6 @@ Tasks for students:
 #include <cstdint>
 #include "EncoderCounter.h"
 #include "EncoderCounterIndex.h"
-#include "IIR_filter.h"
 #include "LinearCharacteristics.h"
 #include "Enc_unwrap_scale.h"
 #include "mpu6500_spi.h"
@@ -20,6 +19,7 @@ public:
     virtual ~sensors_actuators();   // deconstructor
     void read_sensors_calc_speed(void);       // read both encoders and calculate speeds
     float get_phi_fw(void);         // get angle of motor k
+    float get_phi_bd(void);         // get angle of motor k
     float get_vphi_fw(void);          // get speed of motor k
     float get_ax(void);
     float get_ay(void);
@@ -27,10 +27,9 @@ public:
     void write_current(float);  // write current to motors (0,...) for motor 1, (1,...) for motor 2
     void enable_escon();
     void disable_escon();
-    bool key_was_pressed;
+    bool get_key_state(void);
    
 private:
-    IIR_filter di;
     ///------------- Encoder -----------------------
     EncoderCounter counter;    // initialize counter on PA_6 and PC_7
     AnalogOut i_des;           // desired current values
@@ -44,10 +43,11 @@ private:
     Enc_unwrap_scale uw;
     Timer t_but;                            // define button time        // 
     // sensor states
-    float phi_fw;          // motor angle /rad
+    float phi_fw,phi_bd;          // motor angle /rad
     float Vphi_fw;           // motor speed / rad / s
     float accx,accy,gyrz;       // accelerations and gyroscope
     void but_pressed(void);
     void but_released(void);
+    bool key_was_pressed;
 
 };

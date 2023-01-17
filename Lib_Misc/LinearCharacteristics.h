@@ -9,18 +9,12 @@ class LinearCharacteristics{
      public:
             LinearCharacteristics(){};
             LinearCharacteristics(float, float);
-            LinearCharacteristics(float, float, float, float);
-            LinearCharacteristics(float, float, float, float, float, float);
             float evaluate(float);
-            void setup(float, float, float, float);
-            void setup(float, float, float, float, float, float);
             float operator()(float x){
                 return evaluate(x);
                 } 
-                //...
-                virtual     ~LinearCharacteristics();
-                // here: the calculation function
-    
+            virtual     ~LinearCharacteristics();
+                
     private:
         // here: private functions and values...
         float gain;
