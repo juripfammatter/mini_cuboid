@@ -28,7 +28,6 @@ int main()
     ControllerLoop loop(&hardware,Ts);       // this is for the main controller loop
     state_machine sm(&hardware,&loop,0.02);
     WAIT_MS(200);
-    int i;
     printf("- - - - MiniCuboid Start! - - - \r\n");
 // ----------------------------------
     loop.start_loop();
