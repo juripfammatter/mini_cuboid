@@ -12,6 +12,7 @@ static BufferedSerial serial_port(USBTX, USBRX,115200);
 /* 
 This is the main function of embedded project "mini_cuboid" ZHAW FS23
 Altenburger February 2023
+Modified by Juri Pfammatter for RT2 lectures
 */
 
 //******************************************************************************
@@ -27,6 +28,7 @@ int main()
     ControllerLoop loop(&hardware,Ts);       // this is for the main controller loop
     state_machine sm(&hardware,&loop,0.02);
     WAIT_MS(200);
+    int i;
     printf("- - - - MiniCuboid Start! - - - \r\n");
 // ----------------------------------
     loop.start_loop();
