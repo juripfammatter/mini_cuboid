@@ -5,7 +5,7 @@
 
 sensors_actuators::sensors_actuators(float Ts) : counter(PA_8, PA_9),
                             i_enable(PB_1),button(PA_10),i_des(PA_4),uw(4*2048,16),spi(PA_12, PA_11, PA_1),imu(spi, PB_0),
-                            ax2ax(3.9917e-4,0),ay2ay(3.9917e-4,0),gz2gz(7.1018e-4,0)
+                            ax2ax(-16360, 16520, -9.81, 9.81),ay2ay(-17100, 15750, -9.81, 9.81),gz2gz(-32768, 32767, -1000.0f/180.0f*PI, 1000.0f/180.0f*PI)
 {
     button.fall(callback(this, &sensors_actuators::but_pressed));          // attach key pressed function
     button.rise(callback(this, &sensors_actuators::but_released));         // attach key pressed function
@@ -56,15 +56,15 @@ float sensors_actuators::get_vphi_fw(void)
 }
 float sensors_actuators::get_ax(void)
 {
-    return ax2ax.evaluate(accx);//ax2ax(accx);
+    return ax2ax(accx);//ax2ax(accx);
 }
 float sensors_actuators::get_ay(void)
 {
-    return ay2ay.evaluate(accy);
+    return ay2ay(accy);
 }
 float sensors_actuators::get_gz(void)
 {
-    return gz2gz.evaluate(gyrz);
+    return gz2gz(gyrz);
 }
 // start timer as soon as Button is pressed
 void sensors_actuators::but_pressed()

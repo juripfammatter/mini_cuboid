@@ -25,7 +25,7 @@ float LinearCharacteristics::evaluate(float x)
 {   
     if(x>ulim){
         x = ulim;
-    }else if (x>llim){
+    }else if (x<llim){
         x = llim;
     }
     // calculate result as y(x) = gain * (x-offset)
