@@ -3,9 +3,10 @@
 class LinearCharacteristics{
      public:
             LinearCharacteristics(){};              // default constructor
-            LinearCharacteristics(float, float);    // constructor with gain and offset
+            LinearCharacteristics(float gain,float offset);    // constructor with gain and offset
+            LinearCharacteristics(float xmin,float max, float ymin, float ymax);    // constructor with gain and offset
             float evaluate(float);                  // calculate y(x)
-            float operator()(float x){              // calculate with () operator
+            float operator()(float x){              // calculate with () operator; Functor
                 return evaluate(x);
                 } 
             virtual     ~LinearCharacteristics();   // deconstructor
