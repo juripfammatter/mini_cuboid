@@ -26,11 +26,11 @@ int main()
 
     // --------- mini cuboid,
     float Ts = 0.002f;                      // sampling time, typically approx 1/500
-    float tau = 0.001f;
+    //float tau = 0.001f;
 
-    IIR_filter fil_ax(tau, Ts);
-    IIR_filter fil_ay(tau, Ts);
-    IIR_filter fil_gz(tau, Ts);
+    //IIR_filter fil_ax(tau, Ts);
+    //IIR_filter fil_ay(tau, Ts);
+    //IIR_filter fil_gz(tau, Ts);
 
     sensors_actuators hardware(Ts);         // in this class all the physical ios are handled
     ControllerLoop loop(&hardware,Ts);       // this is for the main controller loop
@@ -44,8 +44,7 @@ int main()
     while(1)
         {
         WAIT_MS(500);
-        printf("%f; %f; %f; ",hardware.get_ax(),hardware.get_ay(),hardware.get_gz());
-        printf("%f; %f; %f;\r\n",fil_ax(hardware.get_ax()),fil_ay(hardware.get_ay()),fil_gz(hardware.get_gz()));
+        printf("%f; %f; %f; %f;",hardware.get_ax(),hardware.get_ay(),hardware.get_gz(), hardware.get_phi_bd());
         }
 }   // END OF main
 
