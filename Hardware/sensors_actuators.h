@@ -10,6 +10,7 @@ Tasks for students:
 #include "LinearCharacteristics.h"
 #include "Enc_unwrap_scale.h"
 #include "mpu6500_spi.h"
+#include "IIR_filter.h"
 
 
 class sensors_actuators
@@ -49,5 +50,8 @@ private:
     void but_pressed(void);
     void but_released(void);
     bool key_was_pressed;
+
+    //IIR Filter
+    IIR_filter filter_ax, filter_ay, filter_gz;
 
 };
