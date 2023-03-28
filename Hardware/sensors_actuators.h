@@ -21,7 +21,7 @@ public:
     void read_sensors_calc_speed(void);       // read both encoders and calculate speeds
     float get_phi_fw(void);         // get angle of motor k
     float get_phi_bd(void);         // get angle of motor k
-    float get_vphi_fw(void);          // get speed of motor k
+    float get_omega_fw(void);          // get speed of motor k
     float get_ax(void);
     float get_ay(void);
     float get_gz(void);
@@ -45,7 +45,7 @@ private:
     Timer t_but;                            // define button time        // 
     // sensor states
     float phi_fw,phi_bd;          // motor angle /rad
-    float Vphi_fw;           // motor speed / rad / s
+    float omega_fw;           // motor speed / rad / s
     float accx,accy,gyrz;       // accelerations and gyroscope
     void but_pressed(void);
     void but_released(void);
@@ -53,5 +53,6 @@ private:
 
     //IIR Filter
     IIR_filter filter_ax, filter_ay, filter_gz;
+    IIR_filter diff_phi;                            // differentiating filter
 
 };

@@ -44,8 +44,9 @@ int main()
     while(1)
         {
         WAIT_MS(500);
-        printf("%f; %f; %f; %f;",hardware.get_ax(),hardware.get_ay(),hardware.get_gz(), hardware.get_phi_bd());
-        printf("phi_bd: %f\r\n",hardware.get_phi_bd());
+        //printf("%f; %f; %f; %f;",hardware.get_ax(),hardware.get_ay(),hardware.get_gz(), hardware.get_phi_bd());
+        //printf("phi_bd: %f\r\n",hardware.get_phi_bd());
+        printf("phi_fw: %f, omega: %f\r\n",hardware.get_phi_fw(), hardware.get_omega_fw());
         }
 }   // END OF main
 

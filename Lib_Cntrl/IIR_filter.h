@@ -12,8 +12,9 @@ operator: (float)   // calls "eval"
 class IIR_filter
 {
 public:
+    IIR_filter(float);              //Grobes Ableiten
     IIR_filter(float,float);
-    IIR_filter(float,float,float);
+    IIR_filter(float,float,float);  //Tiefpassfilter
     virtual ~IIR_filter();
     float eval(float);
     float operator()(float u){
