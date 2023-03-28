@@ -22,7 +22,7 @@ public:
 private:
     float *B;
     float *A;
-    float a0,b0;
+    float a0,b0,b1;
     uint8_t nb,na;
-    float Ts, y_old;
+    float Ts, y_old, u_old;
 };
