@@ -13,7 +13,7 @@ class IIR_filter
 {
 public:
     IIR_filter(float);              //Grobes Ableiten
-    IIR_filter(float,float);
+    IIR_filter(float,float);        //Integration
     IIR_filter(float,float,float);  //Tiefpassfilter
     virtual ~IIR_filter();
     float eval(float);
@@ -26,4 +26,5 @@ private:
     float a0,b0,b1;
     uint8_t nb,na;
     float Ts, y_old, u_old;
+    float ulim, llim;               //Limit
 };

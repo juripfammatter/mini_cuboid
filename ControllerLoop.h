@@ -6,6 +6,7 @@
 #include "ThreadFlag.h"
 #include "PID_Cntrl.h"
 #include "sensors_actuators.h"
+#include "IIR_filter.h"
 
 
 // This is the loop class, it is not a controller at first hand, it guarantees a cyclic call
@@ -34,4 +35,5 @@ private:
     void sendSignal();
     float est_angle();
     sensors_actuators *m_sa;
+    IIR_filter I4;                  //Integrator 4th order
 };

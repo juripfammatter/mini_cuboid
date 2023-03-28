@@ -28,7 +28,7 @@ int main()
     float Ts = 0.002f;                      // sampling time, typically approx 1/500
     //float tau = 0.001f;
 
-    //IIR_filter fil_ax(tau, Ts);
+    //IIR_filter fil_ax(tau, Ts);sss
     //IIR_filter fil_ay(tau, Ts);
     //IIR_filter fil_gz(tau, Ts);
 
